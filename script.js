@@ -90,6 +90,20 @@ const removePlayer = async (playerId) => {
     }
 };
 
+/**
+ * Applies styling for the buttons.
+ */
+const applyButtonStyles = () => {
+    // Style your buttons here as needed
+    // For example:
+    const buttons = document.querySelectorAll('.details-btn, .remove-btn, #add-new-player-btn');
+    buttons.forEach(button => {
+        // Add your button styling here
+        button.style.backgroundColor = '#4CAF50';
+        button.style.color = 'white';
+        // Add more styles as needed
+    });
+};
 
 /**
  * It takes an array of player objects, loops through them, and creates a string of HTML for each
@@ -183,6 +197,8 @@ const renderAllPlayers = (playerList) => {
             });
         });
 
+        // Apply styling for the buttons
+        applyButtonStyles();
     } catch (err) {
         console.error('Uh oh, trouble rendering players!', err);
     }
@@ -195,11 +211,139 @@ const renderAllPlayers = (playerList) => {
  */
 const renderNewPlayerForm = () => {
     try {
-        
+        const newPlayerFormHTML = `
+            <div class="new-player-form-container">
+                <h2>Add New Player</h2>
+                <form id="new-player-form">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="breed">Breed:</label>
+                    <input type="text" id="breed" name="breed" required>
+
+                    <label for="status">Status:</label>
+                    <input type="text" id="status" name="status" required>
+
+                    <label for="photo">Photo URL:</label>
+                    <input type="text" id="photo" name="photo" required>
+
+                    <button type="button" class="submit-new-player">Add New Player</button>
+                    <button type="button" class="cancel-new-player">Cancel</button>
+                </form>
+            </div>
+        `;
+
+        // Append the new player form HTML to the body or a specific container
+        document.body.insertAdjacentHTML('beforeend', newPlayerFormHTML);
+
+        // Add event listeners using event delegation
+        document.body.addEventListener('click', (event) => {
+            const target = event.target;
+
+            if (target.classList.contains('submit-new-player')) {
+                // Handle submit button click
+                handleNewPlayerFormSubmit();
+            } else if (target.classList.contains('cancel-new-player')) {
+                // Handle cancel button click
+                handleNewPlayerFormCancel();
+            }
+        });
     } catch (err) {
         console.error('Uh oh, trouble rendering the new player form!', err);
     }
-}
+};
+
+const handleNewPlayerFormSubmit = () => {
+    // Collect form data and call addNewPlayer function
+    const name = document.getElementById('name').value;
+    const breed = document.getElementById('breed').value;
+    const status = document.getElementById('status').value;
+    const photo = document.getElementById('photo').value;
+
+    // Check if all fields are filled
+    if (name && breed && status && photo) {
+        const newPlayerObj = {
+            name: name,
+            breed: breed,
+            status: status,
+            imageUrl: photo,
+        };
+
+        addNewPlayer(newPlayerObj);
+
+        // Close the form and details
+        const formContainer = document.querySelector('.new-player-form-container');
+        if (formContainer) {
+            formContainer.remove();
+            closeDetails();
+        }
+    } else {
+        alert('Please fill in all fields');
+    }
+};
+
+const handleNewPlayerFormCancel = () => {
+    // Close the form and details
+    const formContainer = document.querySelector('.new-player-form-container');
+    if (formContainer) {
+        formContainer.remove();
+        closeDetails();
+    }
+};
+
+const showNewPlayerForm = () => {
+    // Check if the form is already open
+    if (document.querySelector('.new-player-form-container')) {
+        return;
+    }
+
+    // Create a modal or any container to display the form
+    const formContainer = document.createElement('div');
+    formContainer.classList.add('new-player-form-container');
+
+    const formHTML = `
+        <h2>Add New Player</h2>
+        <form id="new-player-form">
+            <!-- ... (your form fields) ... -->
+            <button type="button" class="submit-new-player">Add New Player</button>
+            <button type="button" class="cancel-new-player">Cancel</button>
+        </form>
+    `;
+
+    formContainer.innerHTML = formHTML;
+    document.body.appendChild(formContainer);
+
+    // Scroll down to view the form
+    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Add event listener to the "Add New Player" button
+    const submitButton = formContainer.querySelector('.submit-new-player');
+    submitButton.addEventListener('click', () => {
+        // Check if the button is already disabled
+        if (submitButton.disabled) {
+            return;
+        }
+
+        // Disable the button to prevent multiple clicks
+        submitButton.disabled = true;
+
+        // Collect form data and call addNewPlayer function
+        // ...
+
+        // Close the form and details
+        formContainer.remove();
+        closeDetails();
+    });
+
+    // Add event listener to the "Cancel" button
+    const cancelButton = formContainer.querySelector('.cancel-new-player');
+    cancelButton.addEventListener('click', () => {
+        // Close the form and details
+        formContainer.remove();
+        closeDetails();
+    });
+};
+
 
 const init = async () => {
     try {
@@ -212,21 +356,49 @@ const init = async () => {
             console.error('Error: fetchAllPlayers did not return an array.');
         }
 
-        renderNewPlayerForm();
+        // Render the "Add New Player" button
+        renderNewPlayerFormButton();
     } catch (error) {
         console.error('Error during initialization:', error);
     }
 };
 
+// Add this function to render the "Add New Player" button
+const renderNewPlayerFormButton = () => {
+    try {
+        const newPlayerFormButtonHTML = `
+            <button id="add-new-player-btn">Add New Player</button>
+        `;
+
+        // Append the new player form button HTML to the body or a specific container
+        document.body.insertAdjacentHTML('beforeend', newPlayerFormButtonHTML);
+
+        // Add event listener to the "Add New Player" button
+        const addNewPlayerButton = document.getElementById('add-new-player-btn');
+        addNewPlayerButton.addEventListener('click', () => {
+            // Render the new player form when the button is clicked
+            renderNewPlayerForm();
+        });
+
+    } catch (err) {
+        console.error('Uh oh, trouble rendering the new player form button!', err);
+    }
+};
+
+
 init();
 
-const closeDetails = () => {
-    // Show all player cards again
-    document.querySelectorAll('.player-card').forEach(card => {
-        card.style.display = 'block';
-    });
+const closeDetails = async () => {
+    // Fetch all players again
+    const players = await fetchAllPlayers();
+
+    // Render all players
+    renderAllPlayers(players);
 
     // Clear the details container
     const detailsContainer = document.getElementById('details-container');
     detailsContainer.innerHTML = '';
+
+    // Scroll to the top of the page to reset the view
+    window.scrollTo(0, 0);
 };
