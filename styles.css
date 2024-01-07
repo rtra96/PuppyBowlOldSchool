@@ -3,3 +3,17 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+.player-card {
+  display: grid;
+  grid-template-columns: 150px 50px 50;
+  justify-content: center;
+  text-align: center;
+}
+
+img {
+  max-height: 200px;
+  max-width: 200px;
+  justify-content: center;
+
+}
