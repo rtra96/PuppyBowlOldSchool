@@ -40,8 +40,8 @@
   text-align: center; 
 }
 
-/* New Player form styles */
-.new-player-form {
+
+#new-player-form {
   display: flex;
   flex-direction: column;
   gap: 10px;

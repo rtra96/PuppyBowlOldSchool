@@ -6,7 +6,6 @@ const cohortName = '2308-FTB-MT-WEB-PT';
 // Use the APIURL variable for fetch requests
 const APIURL = `https://fsa-puppy-bowl.herokuapp.com/api/2308-FTB-MT-WEB-PT`;
 
-
 const fetchAllPlayers = async () => {
     try {
         const res = await fetch(`${APIURL}/players/`);
@@ -64,6 +63,7 @@ const addNewPlayer = async (playerObj) => {
             renderAllPlayers(updatedPlayers);
         } else {
             console.error('Failed to add a new player. Please try again.');
+            alert ("Player creation failed. Please check your inputs.")
         }
     } catch (err) {
         console.error('Oops, something went wrong with adding that player!', err);
@@ -222,8 +222,11 @@ const renderNewPlayerForm = () => {
                     <input type="text" id="breed" name="breed" required>
 
                     <label for="status">Status:</label>
-                    <input type="text" id="status" name="status" required>
-
+                    <select id="status" name="status" required>
+                        <option value="bench">Bench</option>
+                        <option value="field">Field</option>
+                    </select>
+                    
                     <label for="photo">Photo URL:</label>
                     <input type="text" id="photo" name="photo" required>
 
